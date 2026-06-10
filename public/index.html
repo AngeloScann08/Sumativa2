@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sumativa 2 - Cliente</title>
+</head>
+<body>
+    <h2>Subir archivo</h2>
+
+    <form action="/subir" method="POST" enctype="multipart/form-data">
+        <input type="file" name="archivo" required>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <hr>
+
+    <h2>Archivos disponibles</h2>
+    <button onclick="listar()">Actualizar lista</button>
+    <ul id="lista"></ul>
+
+    <script>
+        function listar() {
+            fetch("/archivos")
+                .then(r => r.json())
+                .then(data => {
+                    const ul = document.getElementById("lista");
+                    ul.innerHTML = "";
+                    data.forEach(nombre => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `<a href="/descargar/${nombre}">${nombre}</a>`;
+                        ul.appendChild(li);
+                    });
+                });
+        }
+    </script>
+</body>
+</html>
