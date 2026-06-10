@@ -1,37 +1,55 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Sumativa 2 - Cliente</title>
-</head>
-<body>
-    <h2>Subir archivo</h2>
+const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
-    <form action="/subir" method="POST" enctype="multipart/form-data">
-        <input type="file" name="archivo" required>
-        <button type="submit">Enviar</button>
-    </form>
+const app = express();
 
-    <hr>
+// Carpeta donde se guardarán los archivos
+const carpetaUploads = path.join(__dirname, "uploads");
 
-    <h2>Archivos disponibles</h2>
-    <button onclick="listar()">Actualizar lista</button>
-    <ul id="lista"></ul>
+// Crear carpeta si no existe
+if (!fs.existsSync(carpetaUploads)) {
+    fs.mkdirSync(carpetaUploads);
+}
 
-    <script>
-        function listar() {
-            fetch("/archivos")
-                .then(r => r.json())
-                .then(data => {
-                    const ul = document.getElementById("lista");
-                    ul.innerHTML = "";
-                    data.forEach(nombre => {
-                        const li = document.createElement("li");
-                        li.innerHTML = `<a href="/descargar/${nombre}">${nombre}</a>`;
-                        ul.appendChild(li);
-                    });
-                });
-        }
-    </script>
-</body>
-</html>
+// Configuración de Multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, carpetaUploads);
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage });
+
+// Servir carpeta public
+app.use(express.static(path.join(__dirname, "public")));
+
+// Ruta para subir archivos
+app.post("/subir", upload.single("archivo"), (req, res) => {
+    res.send("Archivo subido correctamente");
+});
+
+// Ruta para listar archivos
+app.get("/archivos", (req, res) => {
+    fs.readdir(carpetaUploads, (err, archivos) => {
+        if (err) return res.status(500).json({ error: "Error al leer carpeta" });
+        res.json(archivos);
+    });
+});
+
+// Ruta para descargar archivos
+app.get("/descargar/:nombre", (req, res) => {
+    const archivo = path.join(carpetaUploads, req.params.nombre);
+    res.download(archivo);
+});
+
+// Puerto para Railway
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
