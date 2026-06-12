@@ -31,13 +31,42 @@
             margin-bottom: 15px;
         }
 
-        input[type="file"] {
+        /* BOTÓN DE SELECCIONAR ARCHIVO ESTILIZADO */
+        .file-input-container {
+            position: relative;
             width: 100%;
-            padding: 10px;
-            background: white;
-            color: black;
-            border-radius: 6px;
             margin-bottom: 10px;
+        }
+
+        .file-input {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 45px;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #00b7ff;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .file-label:hover {
+            background: #0095d1;
+        }
+
+        #nombreArchivo {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.8;
+            text-align: center;
         }
 
         button {
@@ -100,8 +129,16 @@
         <h1>Subir archivo</h1>
 
         <form id="formSubida" action="/subir" method="POST" enctype="multipart/form-data">
-            <input type="file" name="archivo" required>
-            <button type="submit">Subir archivo</button>
+
+            <!-- INPUT FILE ESTILIZADO -->
+            <div class="file-input-container">
+                <input type="file" name="archivo" class="file-input" id="archivo" required>
+                <label for="archivo" class="file-label">📁 Seleccionar archivo</label>
+            </div>
+
+            <div id="nombreArchivo">Ningún archivo seleccionado</div>
+
+            <button type="submit">⬆️ Subir archivo</button>
         </form>
 
         <div id="mensaje"></div>
@@ -109,12 +146,22 @@
         <hr>
 
         <h2>Archivos almacenados</h2>
-        <button onclick="cargarArchivos()">Mostrar archivos</button>
+        <button onclick="cargarArchivos()">📄 Mostrar archivos</button>
 
         <ul id="lista"></ul>
     </div>
 
     <script>
+        // Mostrar nombre del archivo seleccionado
+        const archivoInput = document.getElementById("archivo");
+        const nombreArchivo = document.getElementById("nombreArchivo");
+
+        archivoInput.addEventListener("change", () => {
+            nombreArchivo.innerText = archivoInput.files.length > 0
+                ? archivoInput.files[0].name
+                : "Ningún archivo seleccionado";
+        });
+
         // Mostrar mensaje bonito al subir archivo
         const form = document.getElementById("formSubida");
         const mensaje = document.getElementById("mensaje");
@@ -136,6 +183,7 @@
             mensaje.style.display = "block";
 
             form.reset();
+            nombreArchivo.innerText = "Ningún archivo seleccionado";
         });
 
         // Cargar lista de archivos
@@ -159,4 +207,3 @@
     </script>
 </body>
 </html>
-
