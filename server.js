@@ -17,7 +17,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
+
 
 app.post("/subir", upload.single("archivo"), (req, res) => {
     if (!req.file) return res.status(400).send("No subiste ningún archivo");
