@@ -121,6 +121,19 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .btn-borrar {
+            background: #ff4d4d;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-borrar:hover {
+            background: #d93636;
+        }
     </style>
 </head>
 
@@ -198,11 +211,28 @@
                         const li = document.createElement("li");
                         li.innerHTML = `
                             ${nombre}
-                            <a href="/descargar/${nombre}">Descargar</a>
+                            <div>
+                                <a href="/descargar/${nombre}">⬇️ Descargar</a>
+                                <button class="btn-borrar" onclick="borrarArchivo('${nombre}')">🗑️ Borrar</button>
+                            </div>
                         `;
                         lista.appendChild(li);
                     });
                 });
+        }
+
+        // Borrar archivo
+        function borrarArchivo(nombre) {
+            fetch(`/borrar/${nombre}`, {
+                method: "DELETE"
+            })
+            .then(res => res.json())
+            .then(data => {
+                mensaje.innerText = data.mensaje;
+                mensaje.className = "ok";
+                mensaje.style.display = "block";
+                cargarArchivos();
+            });
         }
     </script>
 </body>
