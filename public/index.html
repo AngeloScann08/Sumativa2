@@ -2,10 +2,41 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sumativa 2</title>
+    <title>Sumativa 2 - Subir Archivos</title>
 </head>
 <body>
-    <h1>Servidor funcionando correctamente</h1>
-    <p>Tu aplicación está online en Railway.</p>
+    <h1>Subir archivo al servidor</h1>
+
+    <form action="/subir" method="POST" enctype="multipart/form-data">
+        <input type="file" name="archivo" required>
+        <button type="submit">Subir archivo</button>
+    </form>
+
+    <hr>
+
+    <h2>Archivos almacenados</h2>
+    <button onclick="cargarArchivos()">Mostrar archivos</button>
+
+    <ul id="lista"></ul>
+
+    <script>
+        function cargarArchivos() {
+            fetch("/archivos")
+                .then(res => res.json())
+                .then(data => {
+                    const lista = document.getElementById("lista");
+                    lista.innerHTML = "";
+
+                    data.forEach(nombre => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            ${nombre} 
+                            <a href="/descargar/${nombre}">Descargar</a>
+                        `;
+                        lista.appendChild(li);
+                    });
+                });
+        }
+    </script>
 </body>
 </html>
