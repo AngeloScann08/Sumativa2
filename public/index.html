@@ -3,23 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <title>Sumativa 2 - Subir Archivos</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a1a2a, #1e3c72);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            width: 400px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            color: black;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #1e90ff;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #187bcd;
+        }
+
+        #mensaje {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .ok {
+            background: #28a745;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        li {
+            background: rgba(255,255,255,0.15);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        a {
+            color: #00ffea;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Subir archivo al servidor</h1>
+    <div class="card">
+        <h1>Subir archivo</h1>
 
-    <form action="/subir" method="POST" enctype="multipart/form-data">
-        <input type="file" name="archivo" required>
-        <button type="submit">Subir archivo</button>
-    </form>
+        <form id="formSubida" action="/subir" method="POST" enctype="multipart/form-data">
+            <input type="file" name="archivo" required>
+            <button type="submit">Subir archivo</button>
+        </form>
 
-    <hr>
+        <div id="mensaje"></div>
 
-    <h2>Archivos almacenados</h2>
-    <button onclick="cargarArchivos()">Mostrar archivos</button>
+        <hr>
 
-    <ul id="lista"></ul>
+        <h2>Archivos almacenados</h2>
+        <button onclick="cargarArchivos()">Mostrar archivos</button>
+
+        <ul id="lista"></ul>
+    </div>
 
     <script>
+        // Mostrar mensaje bonito al subir archivo
+        const form = document.getElementById("formSubida");
+        const mensaje = document.getElementById("mensaje");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const data = new FormData(form);
+
+            const res = await fetch("/subir", {
+                method: "POST",
+                body: data
+            });
+
+            const texto = await res.text();
+
+            mensaje.innerText = texto;
+            mensaje.className = "ok";
+            mensaje.style.display = "block";
+
+            form.reset();
+        });
+
+        // Cargar lista de archivos
         function cargarArchivos() {
             fetch("/archivos")
                 .then(res => res.json())
@@ -30,7 +149,7 @@
                     data.forEach(nombre => {
                         const li = document.createElement("li");
                         li.innerHTML = `
-                            ${nombre} 
+                            ${nombre}
                             <a href="/descargar/${nombre}">Descargar</a>
                         `;
                         lista.appendChild(li);
@@ -40,3 +159,4 @@
     </script>
 </body>
 </html>
+
